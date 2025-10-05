@@ -50,11 +50,11 @@ export function ExplorerMode({ controls, onResultsChange, onLoadingChange }: Exp
     // KOI format: KOI-123 or KOI-123.01
     const koiPattern = /^KOI-\d+(\.\d+)?$/
     // KIC format: KIC-12345678
-    const kicPattern = /^KIC-?\d{8,9}$/
+    const kicPattern = /^KIC-?\d{7,9}$/
     // EPIC format: EPIC-12345678
-    const epicPattern = /^EPIC-?\d{8,9}$/
+    const epicPattern = /^EPIC-?\d{7,9}$/
     // TIC format: TIC-12345678
-    const ticPattern = /^TIC-?\d{8,10}$/
+    const ticPattern = /^TIC-?\d{7,10}$/
 
     return koiPattern.test(trimmed) || kicPattern.test(trimmed) || epicPattern.test(trimmed) || ticPattern.test(trimmed)
   }

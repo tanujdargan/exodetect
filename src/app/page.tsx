@@ -8,6 +8,7 @@ import { ExplorerMode } from "@/components/explorer-mode"
 import { ResearcherMode } from "@/components/researcher-mode"
 import { UploadMode } from "@/components/upload-mode"
 import { LightCurveChart } from "@/components/light-curve-chart"
+import { CandidateVisuals } from "@/components/candidate-visuals"
 import type { GlobalControls, PredictionResult } from "@/lib/types"
 
 export default function Home() {
@@ -78,6 +79,10 @@ export default function Home() {
                 transitEvents={result.transitEvents}
                 title={`Light Curve: ${result.targetId}`}
               />
+            )}
+
+            {result && (
+              <CandidateVisuals targetId={result.targetId} />
             )}
 
             {result ? (
