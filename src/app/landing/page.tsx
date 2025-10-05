@@ -23,18 +23,11 @@ export default function LandingPage() {
     setError(null)
     setIsSubmitting(true)
 
-    // Mock auth check
-    const isValid = email.trim().toLowerCase() === "admin@uvic.ca" && password === "1234"
-
+    // Always redirect to dashboard for any input
     await new Promise((r) => setTimeout(r, 400))
-
-    if (isValid) {
-      router.push("/")
-      return
-    }
-
-    setError("Invalid credentials. Use admin@uvic.ca / 1234")
-    setIsSubmitting(false)
+    router.push("/dashboard")
+    // No error, no credential check
+    return
   }
 
   const SocialIconButton = ({ ariaLabel, children, onClick }: { ariaLabel: string; children: React.ReactNode; onClick?: () => void }) => (
