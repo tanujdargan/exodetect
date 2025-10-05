@@ -48,7 +48,7 @@ export default function Home() {
           className="text-white whitespace-nowrap"
         />
         <p className="text-white italic text-[10pt] leading-none md:text-[15pt] lg:text-[1.5rem]">
-          "Empowering every explorer to find new worlds"
+          Welcome to the &ldquo;ExoDetect&rdquo; project
         </p>
       </div>
 
