@@ -1,7 +1,11 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { motion } from "motion/react"
+import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, DragEndEvent } from "@dnd-kit/core"
+import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy, useSortable } from "@dnd-kit/sortable"
+import { CSS } from "@dnd-kit/utilities"
+import { GripVertical } from "lucide-react"
 import { MorphingText } from "@/components/ui/morphing-text"
 import { ResultsCard } from "@/components/results-card"
 import { ExplorerMode } from "@/components/explorer-mode"
@@ -15,6 +19,43 @@ import { Slider } from "@/components/ui/slider"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Badge } from "@/components/ui/badge"
 import type { GlobalControls, PredictionResult } from "@/lib/types"
+
+type TileId = "lightCurve" | "stellarium" | "results"
+
+interface SortableTileProps {
+  id: TileId
+  children: React.ReactNode
+}
+
+function SortableTile({ id, children }: SortableTileProps) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id })
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  }
+
+  return (
+    <div ref={setNodeRef} style={style} className="relative group">
+      <div
+        {...attributes}
+        {...listeners}
+        className="absolute -left-2 top-1/2 -translate-y-1/2 cursor-grab active:cursor-grabbing opacity-0 group-hover:opacity-100 transition-opacity z-10 bg-card/80 backdrop-blur-sm rounded p-1 border border-border/50"
+      >
+        <GripVertical className="w-4 h-4 text-muted-foreground" />
+      </div>
+      {children}
+    </div>
+  )
+}
 
 export default function DashboardPage() {
   const [controls, setControls] = useState<GlobalControls>({
@@ -30,6 +71,47 @@ export default function DashboardPage() {
 
   const [isInferenceRunning, setIsInferenceRunning] = useState(false)
   const [result, setResult] = useState<PredictionResult | null>(null)
+  const [tileOrder, setTileOrder] = useState<TileId[]>(["lightCurve", "stellarium", "results"])
+  const [isMounted, setIsMounted] = useState(false)
+
+  // Load tile order from localStorage on mount (client-side only)
+  useEffect(() => {
+    setIsMounted(true)
+    const savedOrder = localStorage.getItem("tileOrder")
+    if (savedOrder) {
+      try {
+        setTileOrder(JSON.parse(savedOrder))
+      } catch (e) {
+        console.error("Failed to parse saved tile order", e)
+      }
+    }
+  }, [])
+
+  // Save tile order to localStorage when it changes
+  useEffect(() => {
+    if (isMounted) {
+      localStorage.setItem("tileOrder", JSON.stringify(tileOrder))
+    }
+  }, [tileOrder, isMounted])
+
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  )
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event
+
+    if (over && active.id !== over.id) {
+      setTileOrder((items) => {
+        const oldIndex = items.indexOf(active.id as TileId)
+        const newIndex = items.indexOf(over.id as TileId)
+        return arrayMove(items, oldIndex, newIndex)
+      })
+    }
+  }
 
   const handleThresholdChange = (newControls: GlobalControls) => {
     setControls(newControls)
@@ -46,7 +128,7 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background dark relative overflow-hidden">
+    <div className="min-h-screen bg-background dark relative overflow-hidden" suppressHydrationWarning>
       {/* Animated gradient background */}
       <div className="absolute inset-0 bg-gradient-to-br from-violet-600/10 via-background to-blue-600/10 animate-gradient-xy pointer-events-none" />
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-violet-900/20 via-background to-background pointer-events-none" />
@@ -211,18 +293,14 @@ export default function DashboardPage() {
         <div className="absolute top-0 right-20 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl animate-pulse delay-1000 pointer-events-none" />
       </div>
 
-      <main className="relative container mx-auto px-4 py-6">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.3 }}
-          className="grid grid-cols-1 lg:grid-cols-2 gap-8"
-        >
-          {/* Left column: Mode interface */}
+      <main className="relative container mx-auto px-4 py-6" suppressHydrationWarning>
+        <div className={`flex gap-8 ${result ? 'flex-row' : 'flex-col lg:flex-row'}`}>
+          {/* Left column: Mode interface - Sticky when results present */}
           <motion.div
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.6, delay: 0.4 }}
+            className={`${result ? 'w-full lg:w-80 flex-shrink-0' : 'w-full lg:w-1/2'} ${result ? 'lg:sticky lg:top-24 lg:self-start' : ''}`}
           >
             {controls.mode === "explorer" && (
               <ExplorerMode controls={controls} onResultsChange={setResult} onLoadingChange={setIsInferenceRunning} />
@@ -235,51 +313,79 @@ export default function DashboardPage() {
             )}
           </motion.div>
 
-          {/* Right column: Results */}
+          {/* Right column: Results - Takes remaining space */}
           <motion.div
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.6, delay: 0.5 }}
-            className="space-y-6"
+            className={`space-y-6 ${result ? 'flex-1 min-w-0' : 'w-full lg:w-1/2'}`}
           >
-            {result?.lightCurve && (
-              <motion.div
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.5 }}
-              >
-                <LightCurveChart
-                  data={result.lightCurve}
-                  detrendMethod={result.detrendMethod}
-                  transitEvents={result.transitEvents}
-                  title={`Light Curve: ${result.targetId}`}
-                />
-              </motion.div>
-            )}
-
-            {result && (
-              <motion.div
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.5, delay: 0.1 }}
-              >
-                <CandidateVisuals targetId={result.targetId} />
-              </motion.div>
-            )}
-
             {result ? (
-              <motion.div
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.5, delay: 0.2 }}
+              <DndContext
+                sensors={sensors}
+                collisionDetection={closestCenter}
+                onDragEnd={handleDragEnd}
               >
-                <ResultsCard
-                  result={result}
-                  showFeatures={controls.explainability.featureImportances}
-                  showNearestExamples={controls.explainability.nearestExamples}
-                  showDiagnostics={controls.mode === "researcher" || controls.mode === "upload"}
-                />
-              </motion.div>
+                <SortableContext items={tileOrder} strategy={verticalListSortingStrategy}>
+                  <div className="space-y-6">
+                    {tileOrder.map((tileId) => {
+                      if (tileId === "lightCurve" && result.lightCurve) {
+                        return (
+                          <SortableTile key="lightCurve" id="lightCurve">
+                            <motion.div
+                              initial={{ opacity: 0, scale: 0.95 }}
+                              animate={{ opacity: 1, scale: 1 }}
+                              transition={{ duration: 0.5 }}
+                            >
+                              <LightCurveChart
+                                data={result.lightCurve}
+                                detrendMethod={result.detrendMethod}
+                                transitEvents={result.transitEvents}
+                                title={`Light Curve: ${result.targetId}`}
+                              />
+                            </motion.div>
+                          </SortableTile>
+                        )
+                      }
+
+                      if (tileId === "stellarium") {
+                        return (
+                          <SortableTile key="stellarium" id="stellarium">
+                            <motion.div
+                              initial={{ opacity: 0, scale: 0.95 }}
+                              animate={{ opacity: 1, scale: 1 }}
+                              transition={{ duration: 0.5, delay: 0.1 }}
+                            >
+                              <CandidateVisuals targetId={result.targetId} />
+                            </motion.div>
+                          </SortableTile>
+                        )
+                      }
+
+                      if (tileId === "results") {
+                        return (
+                          <SortableTile key="results" id="results">
+                            <motion.div
+                              initial={{ opacity: 0, scale: 0.95 }}
+                              animate={{ opacity: 1, scale: 1 }}
+                              transition={{ duration: 0.5, delay: 0.2 }}
+                            >
+                              <ResultsCard
+                                result={result}
+                                showFeatures={controls.explainability.featureImportances}
+                                showNearestExamples={controls.explainability.nearestExamples}
+                                showDiagnostics={controls.mode === "researcher" || controls.mode === "upload"}
+                              />
+                            </motion.div>
+                          </SortableTile>
+                        )
+                      }
+
+                      return null
+                    })}
+                  </div>
+                </SortableContext>
+              </DndContext>
             ) : (
               <motion.div
                 initial={{ opacity: 0 }}
@@ -301,7 +407,7 @@ export default function DashboardPage() {
               </motion.div>
             )}
           </motion.div>
-        </motion.div>
+        </div>
       </main>
     </div>
   )
