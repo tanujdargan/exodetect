@@ -10,6 +10,7 @@ import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import type { GlobalControls, PredictionResult } from "@/lib/types"
+import { api } from "@/lib/api"
 
 interface UploadModeProps {
   controls: GlobalControls
@@ -163,35 +164,42 @@ export function UploadMode({ controls, onResultsChange, onLoadingChange }: Uploa
     setError(null)
 
     try {
-      await new Promise((resolve) => setTimeout(resolve, 2000))
+      // Call the backend API with the uploaded file
+      const response = await api.uploadLightCurve({
+        file: uploadedFile.file,
+        target_id: targetIdOverride || undefined,
+        mission: controls.mission,
+        include_shap: controls.explainability.featureImportances,
+        include_neighbors: controls.explainability.nearestExamples,
+        threshold: controls.threshold,
+      })
 
-      const mockResult: PredictionResult = {
-        targetId: targetIdOverride || uploadedFile.file.name.replace(/\.(csv|fits|fit)$/i, ""),
-        modelProbabilityCandidate: 0.65,
-        modelLabel: controls.threshold <= 0.65 ? "candidate" : "false-positive",
-        modelVersion: "v2.1.0-upload",
-        topFeatures: controls.explainability.featureImportances
-          ? [
-              { name: "transit_depth_ppm", contribution: 0.198 },
-              { name: "snr", contribution: 0.176 },
-              { name: "duration_hours", contribution: 0.154 },
-            ]
-          : undefined,
-        nearestExamples: controls.explainability.nearestExamples
-          ? [
-              { id: "KOI-123.01", distance: 0.034, disposition: "CANDIDATE" },
-              { id: "KOI-456.01", distance: 0.052, disposition: "FALSE POSITIVE" },
-            ]
-          : undefined,
+      // Map API response to PredictionResult
+      const result: PredictionResult = {
+        targetId: response.target,
+        modelProbabilityCandidate: response.model_probability_candidate,
+        modelLabel: response.model_label as "candidate" | "false-positive" | "abstain",
+        modelVersion: response.model_version,
+        topFeatures: response.top_features?.map((feature) => {
+          const [name, contribution] = Object.entries(feature)[0]
+          return { name, contribution }
+        }),
         diagnostics: {
           uploadedFile: uploadedFile.file.name,
           fileSize: `${(uploadedFile.file.size / 1024).toFixed(2)} KB`,
           rows: uploadedFile.preview?.rows || 0,
+          confidence: response.confidence,
+          processingTime: `${response.processing_time.toFixed(2)}s`,
+          modelName: response.model_name,
+          features: response.features,
+          transitParams: response.transit_params,
         },
       }
 
-      onResultsChange(mockResult)
-    } catch (_err) {
+      onResultsChange(result)
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : "Failed to run classification. Please try again."
+      setError(errorMessage)
       onResultsChange(null)
     } finally {
       onLoadingChange(false)

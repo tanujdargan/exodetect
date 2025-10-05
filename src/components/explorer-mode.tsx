@@ -11,6 +11,7 @@ import { Label } from "@/components/ui/label"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Badge } from "@/components/ui/badge"
 import type { GlobalControls, PredictionResult } from "@/lib/types"
+import { api } from "@/lib/api"
 
 interface ExplorerModeProps {
   controls: GlobalControls
@@ -74,29 +75,6 @@ export function ExplorerMode({ controls, onResultsChange, onLoadingChange }: Exp
     setError(null)
   }
 
-  const generateMockLightCurve = () => {
-    const points = 1000
-    const time: number[] = []
-    const flux: number[] = []
-    const fluxErr: number[] = []
-
-    for (let i = 0; i < points; i++) {
-      const t = i * 0.02
-      time.push(t)
-
-      let f = 1.0 + Math.random() * 0.001
-
-      if ((t % 3.5 > 1.7 && t % 3.5 < 1.85) || (t % 3.5 > 5.2 && t % 3.5 < 5.35)) {
-        f -= 0.015
-      }
-
-      flux.push(f)
-      fluxErr.push(0.0005 + Math.random() * 0.0003)
-    }
-
-    return { time, flux, fluxErr }
-  }
-
   const fetchTargetData = async () => {
     if (!targetId.trim()) {
       setError("Please enter a target ID")
@@ -113,56 +91,49 @@ export function ExplorerMode({ controls, onResultsChange, onLoadingChange }: Exp
     setError(null)
 
     try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1500))
+      const normalizedId = normalizeTargetId(targetId)
 
-      // Mock archive data
-      const mockArchive: ArchiveData = {
-        koi_disposition: "CANDIDATE",
-        koi_pdisposition: "CANDIDATE",
-        koi_score: 0.85,
-        vetting_flags: {
-          ntl: false,
-          ss: false,
-          co: true,
-          em: false,
+      // Call the backend API
+      const response = await api.predictArchive({
+        identifier: normalizedId,
+        mission: controls.mission,
+        include_light_curve: showOptions.lightCurve,
+      })
+
+      // Extract archive data from response
+      const archiveDataFromResponse: ArchiveData = {
+        koi_disposition: response.archive_snapshot?.koi_disposition as string | undefined,
+        koi_pdisposition: response.archive_snapshot?.koi_pdisposition as string | undefined,
+        koi_score: response.archive_snapshot?.koi_score as number | undefined,
+        vetting_flags: response.archive_snapshot?.vetting_flags as ArchiveData['vetting_flags'] | undefined,
+      }
+      setArchiveData(archiveDataFromResponse)
+
+      // Map API response to PredictionResult
+      const result: PredictionResult = {
+        targetId: response.target,
+        modelProbabilityCandidate: response.model_probability_candidate,
+        modelLabel: response.model_label as "candidate" | "false-positive" | "abstain",
+        modelVersion: response.model_version,
+        topFeatures: response.top_features?.map((feature) => {
+          const [name, contribution] = Object.entries(feature)[0]
+          return { name, contribution }
+        }),
+        archiveSnapshot: response.archive_snapshot,
+        diagnostics: {
+          confidence: response.confidence,
+          processingTime: `${response.processing_time.toFixed(2)}s`,
+          modelName: response.model_name,
+          features: response.features,
+          transitParams: response.transit_params,
+          reasoning: response.reasoning,
         },
       }
-      setArchiveData(mockArchive)
 
-      // Mock prediction result
-      const mockResult: PredictionResult = {
-        targetId: normalizeTargetId(targetId),
-        modelProbabilityCandidate: 0.87,
-        modelLabel: controls.threshold <= 0.87 ? "candidate" : "false-positive",
-        modelVersion: "v2.1.0",
-        topFeatures: controls.explainability.featureImportances
-          ? [
-              { name: "transit_depth_ppm", contribution: 0.234 },
-              { name: "transit_duration_hours", contribution: 0.189 },
-              { name: "period_days", contribution: 0.156 },
-              { name: "snr", contribution: 0.142 },
-            ]
-          : undefined,
-        nearestExamples: controls.explainability.nearestExamples
-          ? [
-              { id: "KOI-456.01", distance: 0.023, disposition: "CONFIRMED" },
-              { id: "KOI-789.01", distance: 0.045, disposition: "CANDIDATE" },
-            ]
-          : undefined,
-        archiveSnapshot: mockArchive as Record<string, unknown>,
-        lightCurve: showOptions.lightCurve ? generateMockLightCurve() : undefined,
-        transitEvents: showOptions.lightCurve
-          ? [
-              { time: 1.75, label: "T1" },
-              { time: 5.25, label: "T2" },
-            ]
-          : undefined,
-      }
-
-      onResultsChange(mockResult)
-    } catch (_err) {
-      setError("Failed to fetch target data. Please try again.")
+      onResultsChange(result)
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : "Failed to fetch target data. Please try again."
+      setError(errorMessage)
       onResultsChange(null)
     } finally {
       setIsValidating(false)
