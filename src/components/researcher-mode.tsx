@@ -3,7 +3,8 @@
 import type React from "react"
 
 import { useState } from "react"
-import { Search, Loader2, AlertCircle, X } from "lucide-react"
+import { motion } from "motion/react"
+import { Search, Loader2, AlertCircle, X, Sparkles } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
@@ -167,22 +168,47 @@ export function ResearcherMode({ controls, onResultsChange, onLoadingChange }: R
   }
 
   return (
-    <div className="space-y-6">
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.5 }}
+      className="space-y-6"
+    >
       <div className="space-y-4">
-        <div>
-          <h2 className="text-2xl font-bold mb-2">Researcher Mode</h2>
-          <p className="text-sm text-muted-foreground">
-            Advanced controls for power users with custom column selection and detrending
-          </p>
-        </div>
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.1 }}
+          className="relative"
+        >
+          <div className="absolute -inset-1 bg-gradient-to-r from-violet-600/20 to-blue-600/20 rounded-lg blur-lg opacity-50" />
+          <div className="relative bg-card/80 backdrop-blur-sm border border-border/50 rounded-lg p-6">
+            <div className="flex items-center gap-3 mb-3">
+              <div className="p-2 bg-violet-500/10 rounded-lg">
+                <Sparkles className="w-5 h-5 text-violet-400" />
+              </div>
+              <h2 className="text-2xl font-bold bg-gradient-to-r from-violet-400 to-blue-400 bg-clip-text text-transparent">
+                Researcher Mode
+              </h2>
+            </div>
+            <p className="text-sm text-muted-foreground/80">
+              Advanced controls for power users with custom column selection and detrending
+            </p>
+          </div>
+        </motion.div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Target ID Search */}
-          <div className="space-y-2">
-            <Label htmlFor="researcher-target">Target ID</Label>
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: 0.2 }}
+            className="space-y-2"
+          >
+            <Label htmlFor="researcher-target" className="text-sm font-semibold">Target ID</Label>
             <div className="flex gap-2">
-              <div className="flex-1 relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <div className="flex-1 relative group">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground group-hover:text-violet-400 transition-colors" />
                 <Input
                   id="researcher-target"
                   type="text"
@@ -192,11 +218,15 @@ export function ResearcherMode({ controls, onResultsChange, onLoadingChange }: R
                     setTargetId(e.target.value)
                     setError(null)
                   }}
-                  className="pl-10"
+                  className="pl-10 bg-background/50 border-border/60 focus:border-violet-500/50 focus:ring-violet-500/20 transition-all"
                   disabled={isValidating}
                 />
               </div>
-              <Button type="submit" disabled={isValidating || !targetId.trim()}>
+              <Button
+                type="submit"
+                disabled={isValidating || !targetId.trim()}
+                className="bg-gradient-to-r from-violet-600 to-blue-600 hover:from-violet-700 hover:to-blue-700 border-0 shadow-lg shadow-violet-500/20 transition-all hover:shadow-xl hover:shadow-violet-500/30"
+              >
                 {isValidating ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -207,7 +237,7 @@ export function ResearcherMode({ controls, onResultsChange, onLoadingChange }: R
                 )}
               </Button>
             </div>
-          </div>
+          </motion.div>
 
           {error && (
             <Alert variant="destructive">
@@ -217,50 +247,77 @@ export function ResearcherMode({ controls, onResultsChange, onLoadingChange }: R
           )}
 
           {/* Column Picker */}
-          <div className="space-y-3 p-4 rounded-lg border border-border bg-card">
-            <Label className="text-sm font-semibold">Selected Columns</Label>
-            <p className="text-xs text-muted-foreground">Choose which features to include in the analysis</p>
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: 0.3 }}
+            className="relative space-y-3 p-6 rounded-xl border border-border/50 bg-gradient-to-br from-card/80 to-card/40 backdrop-blur-sm"
+          >
+            <div className="absolute top-0 right-0 w-32 h-32 bg-violet-500/5 rounded-full blur-2xl" />
+            <Label className="text-sm font-semibold relative">Selected Columns</Label>
+            <p className="text-xs text-muted-foreground/80 relative">Choose which features to include in the analysis</p>
 
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <span className="text-xs font-medium text-muted-foreground">Transit Parameters</span>
+            <div className="space-y-5 relative">
+              <div className="space-y-3">
+                <span className="text-xs font-semibold text-violet-400/90 uppercase tracking-wide">Transit Parameters</span>
                 <div className="flex flex-wrap gap-2">
-                  {AVAILABLE_COLUMNS.transit.map((col) => (
-                    <Badge
+                  {AVAILABLE_COLUMNS.transit.map((col, idx) => (
+                    <motion.div
                       key={col}
-                      variant={selectedColumns.includes(col) ? "default" : "outline"}
-                      className="cursor-pointer hover:bg-accent transition-colors"
-                      onClick={() => toggleColumn(col)}
+                      initial={{ opacity: 0, scale: 0.8 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ duration: 0.2, delay: idx * 0.03 }}
                     >
-                      {col}
-                      {selectedColumns.includes(col) && <X className="ml-1 h-3 w-3" />}
-                    </Badge>
+                      <Badge
+                        variant={selectedColumns.includes(col) ? "default" : "outline"}
+                        className={`cursor-pointer transition-all duration-200 ${
+                          selectedColumns.includes(col)
+                            ? "bg-violet-600 hover:bg-violet-700 border-violet-500 shadow-sm shadow-violet-500/20"
+                            : "hover:bg-violet-500/10 hover:border-violet-500/50"
+                        }`}
+                        onClick={() => toggleColumn(col)}
+                      >
+                        {col}
+                        {selectedColumns.includes(col) && <X className="ml-1 h-3 w-3" />}
+                      </Badge>
+                    </motion.div>
                   ))}
                 </div>
               </div>
 
-              <div className="space-y-2">
-                <span className="text-xs font-medium text-muted-foreground">Stellar Parameters</span>
+              <div className="space-y-3">
+                <span className="text-xs font-semibold text-blue-400/90 uppercase tracking-wide">Stellar Parameters</span>
                 <div className="flex flex-wrap gap-2">
-                  {AVAILABLE_COLUMNS.stellar.map((col) => (
-                    <Badge
+                  {AVAILABLE_COLUMNS.stellar.map((col, idx) => (
+                    <motion.div
                       key={col}
-                      variant={selectedColumns.includes(col) ? "default" : "outline"}
-                      className="cursor-pointer hover:bg-accent transition-colors"
-                      onClick={() => toggleColumn(col)}
+                      initial={{ opacity: 0, scale: 0.8 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ duration: 0.2, delay: (AVAILABLE_COLUMNS.transit.length + idx) * 0.03 }}
                     >
-                      {col}
-                      {selectedColumns.includes(col) && <X className="ml-1 h-3 w-3" />}
-                    </Badge>
+                      <Badge
+                        variant={selectedColumns.includes(col) ? "default" : "outline"}
+                        className={`cursor-pointer transition-all duration-200 ${
+                          selectedColumns.includes(col)
+                            ? "bg-blue-600 hover:bg-blue-700 border-blue-500 shadow-sm shadow-blue-500/20"
+                            : "hover:bg-blue-500/10 hover:border-blue-500/50"
+                        }`}
+                        onClick={() => toggleColumn(col)}
+                      >
+                        {col}
+                        {selectedColumns.includes(col) && <X className="ml-1 h-3 w-3" />}
+                      </Badge>
+                    </motion.div>
                   ))}
                 </div>
               </div>
             </div>
 
-            <div className="text-xs text-muted-foreground pt-2">
+            <div className="text-xs font-medium text-muted-foreground pt-3 flex items-center gap-2 relative">
+              <div className="w-2 h-2 rounded-full bg-violet-500 animate-pulse" />
               {selectedColumns.length} column{selectedColumns.length !== 1 ? "s" : ""} selected
             </div>
-          </div>
+          </motion.div>
 
           {/* Detrending Method */}
           <div className="space-y-2">
@@ -356,6 +413,6 @@ export function ResearcherMode({ controls, onResultsChange, onLoadingChange }: R
           </div>
         </form>
       </div>
-    </div>
+    </motion.div>
   )
 }
