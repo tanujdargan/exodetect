@@ -2,7 +2,6 @@
 
 import { useState } from "react"
 import { TopBar } from "@/components/top-bar"
-import { MorphingText } from "@/components/ui/morphing-text"
 import { ResultsCard } from "@/components/results-card"
 import { ExplorerMode } from "@/components/explorer-mode"
 import { ResearcherMode } from "@/components/researcher-mode"
@@ -41,17 +40,6 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-background dark">
-      {/* Morphing Text Section */}
-      <div className="flex flex-col justify-center items-center py-12 bg-gradient-to-b from-background to-card/20 space-y-4">
-        <MorphingText 
-          texts={["ExoDetect", "Exoplanet Detect"]}
-          className="text-white whitespace-nowrap"
-        />
-        <p className="text-white italic text-[10pt] leading-none md:text-[15pt] lg:text-[1.5rem]">
-          "Empowering every explorer to find new worlds"
-        </p>
-      </div>
-
       <TopBar controls={controls} onControlsChange={handleThresholdChange} isInferenceRunning={isInferenceRunning} />
 
       <main className="container mx-auto px-4 py-8">
