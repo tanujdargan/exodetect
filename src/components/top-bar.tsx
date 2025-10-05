@@ -4,6 +4,7 @@ import { Slider } from "@/components/ui/slider"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Label } from "@/components/ui/label"
 import { Badge } from "@/components/ui/badge"
+import { MorphingText } from "@/components/ui/morphing-text"
 import type { UserMode, Mission, GlobalControls } from "@/lib/types"
 
 interface TopBarProps {
