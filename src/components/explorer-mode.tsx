@@ -47,16 +47,26 @@ export function ExplorerMode({ controls, onResultsChange, onLoadingChange }: Exp
   const validateTargetId = (id: string): boolean => {
     const trimmed = id.trim().toUpperCase()
 
-    // KOI format: KOI-123 or KOI-123.01
-    const koiPattern = /^KOI-\d+(\.\d+)?$/
-    // KIC format: KIC-12345678
-    const kicPattern = /^KIC-?\d{8,9}$/
-    // EPIC format: EPIC-12345678
-    const epicPattern = /^EPIC-?\d{8,9}$/
-    // TIC format: TIC-12345678
-    const ticPattern = /^TIC-?\d{8,10}$/
+    // KOI format: KOI-123 or KOI-123.01 (allows KOI 123, koi-123, etc.)
+    const koiPattern = /^KOI[- ]?\d+(\.\d+)?$/i
+    // KIC format: KIC-12345678 (allows KIC 12345678, kic-12345678, etc.)
+    const kicPattern = /^KIC[- ]?\d{7,9}$/i
+    // EPIC format: EPIC-12345678 (allows EPIC 12345678, epic-12345678, etc.)
+    const epicPattern = /^EPIC[- ]?\d{7,9}$/i
+    // TIC format: TIC-12345678 (allows TIC 12345678, tic-12345678, etc.)
+    const ticPattern = /^TIC[- ]?\d{7,10}$/i
 
     return koiPattern.test(trimmed) || kicPattern.test(trimmed) || epicPattern.test(trimmed) || ticPattern.test(trimmed)
+  }
+
+  // Normalize target ID to space-separated format for Stellarium
+  const normalizeTargetId = (id: string): string => {
+    const trimmed = id.trim().toUpperCase()
+    // Replace hyphens with spaces and ensure single space between prefix and number
+    // KOI-123 → "KOI 123", koi123 → "KOI 123", KIC-12345678 → "KIC 12345678"
+    return trimmed
+      .replace(/^(KOI|KIC|EPIC|TIC)[-\s]?(\d)/i, "$1 $2")
+      .toUpperCase()
   }
 
   const handleInputChange = (value: string) => {
@@ -122,7 +132,7 @@ export function ExplorerMode({ controls, onResultsChange, onLoadingChange }: Exp
 
       // Mock prediction result
       const mockResult: PredictionResult = {
-        targetId: targetId.trim().toUpperCase(),
+        targetId: normalizeTargetId(targetId),
         modelProbabilityCandidate: 0.87,
         modelLabel: controls.threshold <= 0.87 ? "candidate" : "false-positive",
         modelVersion: "v2.1.0",
