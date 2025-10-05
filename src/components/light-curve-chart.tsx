@@ -84,24 +84,24 @@ export function LightCurveChart({
           <LineChart data={chartData} margin={{ top: 5, right: 20, left: 10, bottom: 5 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.3} />
             <XAxis
-              dataKey="time"
-              stroke="hsl(var(--muted-foreground))"
-              tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 11 }}
-              label={{
-                value: "Time (BJD)",
-                position: "insideBottom",
-                offset: -5,
-                fill: "hsl(var(--muted-foreground))",
-              }}
+            dataKey="time"
+            stroke="white"  
+            tick={{ fill: "white", fontSize: 11 }}  
+            label={{
+              value: "Time (BJD)",
+              position: "insideBottom",
+              offset: -5,
+              fill: "white",  
+            }}
             />
             <YAxis
-              stroke="hsl(var(--muted-foreground))"
-              tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 11 }}
+              stroke="white"  
+              tick={{ fill: "white", fontSize: 11 }}  
               label={{
                 value: "Normalized Flux",
                 angle: -90,
                 position: "insideLeft",
-                fill: "hsl(var(--muted-foreground))",
+                fill: "white",  
               }}
             />
             <Tooltip content={<CustomTooltip />} />
@@ -116,7 +116,7 @@ export function LightCurveChart({
                 label={{
                   value: event.label,
                   position: "top",
-                  fill: "hsl(var(--chart-1))",
+                  fill: "white",  
                   fontSize: 10,
                 }}
               />
@@ -125,11 +125,12 @@ export function LightCurveChart({
             <Line
               type="monotone"
               dataKey="flux"
-              stroke="hsl(var(--chart-2))"
-              strokeWidth={1.5}
+              stroke="red"  
+              strokeWidth={2.5}  
               dot={false}
               isAnimationActive={false}
-            />
+              connectNulls={true}  
+/>
           </LineChart>
         </ResponsiveContainer>
 

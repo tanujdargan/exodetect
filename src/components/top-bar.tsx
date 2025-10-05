@@ -84,12 +84,10 @@ export function TopBar({ controls, onControlsChange, isInferenceRunning = false 
 
           {/* Second row: Threshold slider */}
           <div className="flex flex-col gap-2">
-            <div className="flex items-center justify-between">
               <Label htmlFor="threshold" className="text-sm font-medium">
                 Decision Threshold
               </Label>
               <span className="text-sm font-mono text-muted-foreground">{controls.threshold.toFixed(2)}</span>
-            </div>
             <Slider
               id="threshold"
               min={0}
