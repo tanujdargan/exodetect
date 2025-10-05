@@ -1,7 +1,7 @@
 export type UserMode = "explorer" | "researcher" | "upload"
 export type Mission = "kepler" | "k2" | "tess" | "other"
 export type DetrendMethod = "none" | "median" | "spline"
-export type TransitSearchMethod = "bls" | "tls"
+export type TransitSearchMethod = "none" | "bls" | "tls"
 
 export interface GlobalControls {
   mode: UserMode
@@ -28,8 +28,8 @@ export interface PredictionResult {
     distance: number
     disposition: string
   }>
-  archiveSnapshot?: Record<string, any>
-  diagnostics?: Record<string, any>
+  archiveSnapshot?: Record<string, unknown>
+  diagnostics?: Record<string, unknown>
   lightCurve?: LightCurveData
   detrendMethod?: DetrendMethod
   transitEvents?: Array<{ time: number; label: string }>

@@ -4,6 +4,7 @@ import { useMemo } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine } from "recharts"
+import type { TooltipProps } from "recharts"
 import type { LightCurveData, DetrendMethod } from "@/lib/types"
 
 interface LightCurveChartProps {
@@ -51,12 +52,12 @@ export function LightCurveChart({
     }))
   }, [data, detrendMethod])
 
-  const CustomTooltip = ({ active, payload }: any) => {
+  const CustomTooltip = ({ active, payload }: TooltipProps<number, string>) => {
     if (active && payload && payload.length) {
       return (
         <div className="bg-background border border-border rounded-lg p-3 shadow-lg">
           <p className="text-xs font-mono text-muted-foreground">Time: {payload[0].payload.time.toFixed(4)}</p>
-          <p className="text-xs font-mono">Flux: {payload[0].value.toFixed(6)}</p>
+          {payload[0].value && <p className="text-xs font-mono">Flux: {payload[0].value.toFixed(6)}</p>}
           {payload[0].payload.fluxErr && (
             <p className="text-xs font-mono text-muted-foreground">Error: ±{payload[0].payload.fluxErr.toFixed(6)}</p>
           )}

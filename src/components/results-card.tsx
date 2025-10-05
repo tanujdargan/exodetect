@@ -74,13 +74,13 @@ export function ResultsCard({ result, showFeatures, showNearestExamples, showDia
               <div className="space-y-2">
                 <h4 className="text-sm font-semibold">Archive Data</h4>
                 <div className="grid grid-cols-2 gap-2 text-xs">
-                  {result.archiveSnapshot.koi_disposition && (
+                  {typeof result.archiveSnapshot.koi_disposition === "string" && (
                     <div className="flex flex-col">
                       <span className="text-muted-foreground">KOI Disposition</span>
                       <span className="font-mono">{result.archiveSnapshot.koi_disposition}</span>
                     </div>
                   )}
-                  {result.archiveSnapshot.koi_score !== undefined && (
+                  {typeof result.archiveSnapshot.koi_score === "number" && (
                     <div className="flex flex-col">
                       <span className="text-muted-foreground">KOI Score</span>
                       <span className="font-mono">{result.archiveSnapshot.koi_score.toFixed(2)}</span>

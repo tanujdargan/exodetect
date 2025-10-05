@@ -44,7 +44,7 @@ export function ResearcherMode({ controls, onResultsChange, onLoadingChange }: R
     "snr",
   ])
   const [detrendMethod, setDetrendMethod] = useState<DetrendMethod>("none")
-  const [transitSearchMethod, setTransitSearchMethod] = useState<TransitSearchMethod | "">("none")
+  const [transitSearchMethod, setTransitSearchMethod] = useState<TransitSearchMethod>("none")
   const [searchParams, setSearchParams] = useState({
     periodMin: "",
     periodMax: "",
@@ -138,7 +138,7 @@ export function ResearcherMode({ controls, onResultsChange, onLoadingChange }: R
       }
 
       onResultsChange(mockResult)
-    } catch (err) {
+    } catch (_err) {
       setError("Failed to fetch target data. Please try again.")
       onResultsChange(null)
     } finally {
@@ -270,7 +270,7 @@ export function ResearcherMode({ controls, onResultsChange, onLoadingChange }: R
               <Label htmlFor="transit-search">Transit Search Method (Optional)</Label>
               <Select
                 value={transitSearchMethod}
-                onValueChange={(value) => setTransitSearchMethod(value as TransitSearchMethod | "")}
+                onValueChange={(value) => setTransitSearchMethod(value as TransitSearchMethod)}
               >
                 <SelectTrigger id="transit-search">
                   <SelectValue placeholder="None" />

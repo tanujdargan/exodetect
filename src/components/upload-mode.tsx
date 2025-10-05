@@ -22,7 +22,7 @@ interface UploadedFile {
   preview?: {
     rows: number
     columns: string[]
-    sampleData: Record<string, any>[]
+    sampleData: Record<string, string | number>[]
   }
 }
 
@@ -68,7 +68,7 @@ export function UploadMode({ controls, onResultsChange, onLoadingChange }: Uploa
           const headers = lines[0].split(",").map((h) => h.trim())
           const sampleData = lines.slice(1, Math.min(6, lines.length)).map((line) => {
             const values = line.split(",")
-            const row: Record<string, any> = {}
+            const row: Record<string, string | number> = {}
             headers.forEach((header, idx) => {
               row[header] = values[idx]?.trim() || ""
             })
@@ -80,7 +80,7 @@ export function UploadMode({ controls, onResultsChange, onLoadingChange }: Uploa
             columns: headers,
             sampleData,
           })
-        } catch (err) {
+    } catch (_err) {
           reject(new Error("Failed to parse CSV file"))
         }
       }
@@ -191,8 +191,7 @@ export function UploadMode({ controls, onResultsChange, onLoadingChange }: Uploa
       }
 
       onResultsChange(mockResult)
-    } catch (err) {
-      setError("Failed to run inference. Please try again.")
+    } catch (_err) {
       onResultsChange(null)
     } finally {
       onLoadingChange(false)

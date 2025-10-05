@@ -77,7 +77,7 @@ export function NearestExamplesCard({ examples }: NearestExamplesCardProps) {
 
         <div className="mt-4 p-3 rounded-lg bg-muted/30">
           <p className="text-xs text-muted-foreground">
-            These examples represent the most similar targets in feature space, helping to understand the model's
+            These examples represent the most similar targets in feature space, helping to understand the model&apos;s
             decision by comparison with known cases.
           </p>
         </div>

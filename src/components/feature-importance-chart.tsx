@@ -3,6 +3,8 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from "recharts"
 
+import type { TooltipProps } from "recharts"
+
 interface FeatureImportanceChartProps {
   features: Array<{
     name: string
@@ -17,7 +19,7 @@ export function FeatureImportanceChart({ features }: FeatureImportanceChartProps
     contribution: f.contribution,
   }))
 
-  const CustomTooltip = ({ active, payload }: any) => {
+  const CustomTooltip = ({ active, payload }: TooltipProps<number, string>) => {
     if (active && payload && payload.length) {
       const data = payload[0].payload
       return (

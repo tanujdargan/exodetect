@@ -140,7 +140,7 @@ export function ExplorerMode({ controls, onResultsChange, onLoadingChange }: Exp
               { id: "KOI-789.01", distance: 0.045, disposition: "CANDIDATE" },
             ]
           : undefined,
-        archiveSnapshot: mockArchive,
+        archiveSnapshot: mockArchive as Record<string, unknown>,
         lightCurve: showOptions.lightCurve ? generateMockLightCurve() : undefined,
         transitEvents: showOptions.lightCurve
           ? [
@@ -151,7 +151,7 @@ export function ExplorerMode({ controls, onResultsChange, onLoadingChange }: Exp
       }
 
       onResultsChange(mockResult)
-    } catch (err) {
+    } catch (_err) {
       setError("Failed to fetch target data. Please try again.")
       onResultsChange(null)
     } finally {
