@@ -42,6 +42,7 @@
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
   --animate-shine: shine var(--duration) infinite linear;
+  --animate-gradient-xy: gradient-xy 15s ease infinite;
   @keyframes shine {
   0% {
     background-position: 0% 0%;
@@ -51,6 +52,14 @@
     }
   to {
     background-position: 0% 0%;
+    }
+  }
+  @keyframes gradient-xy {
+    0%, 100% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
     }
   }
 }
@@ -130,5 +139,12 @@
   }
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+@layer utilities {
+  .animate-gradient-xy {
+    animation: gradient-xy 15s ease infinite;
+    background-size: 400% 400%;
   }
 }

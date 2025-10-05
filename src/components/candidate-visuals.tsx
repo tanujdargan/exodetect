@@ -31,8 +31,8 @@ export function CandidateVisuals({ targetId }: CandidateVisualsProps) {
     // - fov=0.12432 for more zoomed in view (smaller field of view = more zoomed in)
     // - atmosphere=false to disable atmosphere
     // - landscape=false to disable ground/horizon
-    // - hide_panel=true to close left navigation panel
-    const url = `https://stellarium-web.org/skysource/${encodedStar}?fov=0.12432&atmosphere=false&landscape=false&hide_panel=true`
+    // - hide_panel=1 to close left navigation panel (must use 1, not true)
+    const url = `https://stellarium-web.org/skysource/${encodedStar}?fov=0.12432&atmosphere=false&landscape=false&hide_panel=1`
 
     setStellariumUrl(url)
   }, [targetId])
@@ -55,7 +55,11 @@ export function CandidateVisuals({ targetId }: CandidateVisualsProps) {
               className="w-full h-full"
               title={`Stellarium view of ${targetId}`}
               allow="fullscreen"
-              style={{ border: 0 }}
+              style={{
+                border: 0,
+                marginLeft: '-300px',
+                width: 'calc(100% + 300px)'
+              }}
             />
           ) : (
             <div className="flex items-center justify-center h-full bg-card">
