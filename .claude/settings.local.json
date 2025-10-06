@@ -24,7 +24,8 @@
       "Bash(curl -s \"https://exoplanetarchive.ipac.caltech.edu/TAP/sync?query=SELECT+pl_name,hostname+FROM+ps+WHERE+hostname+LIKE+%27%25-5568067%25%27&format=json\")",
       "Bash(npm install:*)",
       "Bash(openssl rand:*)",
-      "Bash(find:*)"
+      "Bash(find:*)",
+      "Bash(npm run dev:*)"
     ],
     "deny": [],
     "ask": []
