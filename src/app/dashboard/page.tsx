@@ -5,8 +5,10 @@ import { motion } from "motion/react"
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, DragEndEvent } from "@dnd-kit/core"
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy, useSortable } from "@dnd-kit/sortable"
 import { CSS } from "@dnd-kit/utilities"
-import { GripVertical } from "lucide-react"
+import { GripVertical, ArrowLeft } from "lucide-react"
+import Link from "next/link"
 import { MorphingText } from "@/components/ui/morphing-text"
+import { Button } from "@/components/ui/button"
 import { ResultsCard } from "@/components/results-card"
 import { ExplorerMode } from "@/components/explorer-mode"
 import { ResearcherMode } from "@/components/researcher-mode"
@@ -114,6 +116,11 @@ export default function DashboardPage() {
   }
 
   const handleThresholdChange = (newControls: GlobalControls) => {
+    // Reset results when mode changes
+    if (newControls.mode !== controls.mode) {
+      setResult(null)
+    }
+
     setControls(newControls)
 
     if (result && newControls.threshold !== controls.threshold) {
@@ -132,6 +139,25 @@ export default function DashboardPage() {
       {/* Animated gradient background */}
       <div className="absolute inset-0 bg-gradient-to-br from-violet-600/10 via-background to-blue-600/10 animate-gradient-xy pointer-events-none" />
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-violet-900/20 via-background to-background pointer-events-none" />
+
+      {/* Navigation Bar */}
+      <div className="relative z-10 border-b border-border/40 bg-card/80 backdrop-blur-xl supports-[backdrop-filter]:bg-card/60">
+        <div className="container mx-auto px-4 py-4">
+          <div className="flex items-center justify-between">
+            <Link href="/">
+              <Button variant="ghost" size="sm" className="flex items-center gap-2">
+                <ArrowLeft className="w-4 h-4" />
+                Landing Page
+              </Button>
+            </Link>
+            <Link href="/about">
+              <Button variant="ghost" size="sm">
+                About Us
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </div>
 
       {/* Hero Section - Compact */}
       <div className="border-b border-border/40 bg-card/80 backdrop-blur-xl supports-[backdrop-filter]:bg-card/60">
