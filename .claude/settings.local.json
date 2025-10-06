@@ -1,0 +1,26 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm run build:*)",
+      "Bash(python -c \"from auth import hash_password, verify_password; pwd=''test123''; hashed=hash_password(pwd); print(''Hash:'', hashed[:20]+''...''); print(''Verify:'', verify_password(pwd, hashed))\")",
+      "Bash(python -c \"\nimport sys\nsys.path.insert(0, ''.'')\nfrom auth import hash_password, verify_password\npwd = ''test123''\nhashed = hash_password(pwd)\nprint(''✅ Hash created:'', hashed[:30] + ''...'')\nprint(''✅ Verify correct password:'', verify_password(pwd, hashed))\nprint(''✅ Verify wrong password:'', verify_password(''wrong'', hashed))\n\")",
+      "Bash(python -c \"\nimport sys\nsys.path.insert(0, ''.'')\nfrom auth import hash_password, verify_password\npwd = ''test123''\nhashed = hash_password(pwd)\nprint(''✅ Hash created:'', hashed[:30] + ''...'')\nprint(''✅ Verify correct password:'', verify_password(pwd, hashed))\nprint(''✅ Verify wrong password:'', verify_password(''wrong'', hashed))\nprint(''✅ Authentication system working!'')\n\")",
+      "Bash(python -c \"\nimport sys\nsys.path.insert(0, ''.'')\nfrom auth import hash_password, verify_password\npwd = ''test123''\nhashed = hash_password(pwd)\nprint(''✅ Hash created:'', hashed[:30] + ''...'')\nprint(''✅ Verify correct password:'', verify_password(pwd, hashed))\nprint(''✅ Verify wrong password:'', verify_password(''wrong'', hashed))\nprint(''\\n✅ Authentication system working!'')\n\")",
+      "Bash(python test:*)",
+      "Bash(timeout:*)",
+      "Bash(python:*)",
+      "Bash(cat:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(curl -s \"https://exoplanetarchive.ipac.caltech.edu/TAP/sync?query=SELECT+kepoi_name+FROM+cumulative+LIMIT+5&format=json\")",
+      "Bash(curl -s \"https://exoplanetarchive.ipac.caltech.edu/TAP/sync?query=SELECT+kepoi_name+FROM+cumulative+WHERE+kepoi_name+LIKE+''K00007%25''&format=json\")",
+      "Bash(curl -s \"https://exoplanetarchive.ipac.caltech.edu/TAP/sync?query=SELECT+kepoi_name+FROM+cumulative+WHERE+kepoi_name+=+''K00007.01''&format=json\")",
+      "Bash(curl -s \"https://exoplanetarchive.ipac.caltech.edu/TAP/sync?query=SELECT+kepoi_name,kepid,koi_disposition,koi_pdisposition,koi_score,koi_period,koi_duration,koi_depth,koi_prad,koi_teq,koi_insol,koi_steff,koi_slogg,koi_srad,koi_flag_ntl,koi_flag_ss,koi_flag_co,koi_flag_em+FROM+cumulative+WHERE+kepoi_name+=+''''K00007.01''''&format=json\")",
+      "Bash(curl \"https://exoplanetarchive.ipac.caltech.edu/TAP/sync?query=SELECT+kepoi_name,kepid+FROM+cumulative+WHERE+kepoi_name+=+''''K00007.01''''&format=json\")",
+      "Bash(curl -s \"https://exoplanetarchive.ipac.caltech.edu/TAP/sync?query=SELECT+kepoi_name,kepid,koi_disposition,koi_pdisposition,koi_score,koi_period,koi_duration,koi_depth,koi_prad,koi_teq,koi_insol,koi_steff,koi_slogg,koi_srad,koi_flag_ntl,koi_flag_ss,koi_flag_co,koi_flag_em+FROM+cumulative+WHERE+kepoi_name+=+%27K00007.01%27&format=json\")",
+      "Bash(curl \"https://exoplanetarchive.ipac.caltech.edu/TAP/sync?query=SELECT+kepoi_name,kepid+FROM+cumulative+WHERE+kepoi_name+=+%27K00007.01%27&format=json\")"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

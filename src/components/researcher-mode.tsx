@@ -12,6 +12,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Badge } from "@/components/ui/badge"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import type { GlobalControls, PredictionResult, DetrendMethod, TransitSearchMethod } from "@/lib/types"
+import { api } from "@/lib/api"
 
 interface ResearcherModeProps {
   controls: GlobalControls
@@ -80,26 +81,6 @@ export function ResearcherMode({ controls, onResultsChange, onLoadingChange }: R
     setSelectedColumns((prev) => (prev.includes(column) ? prev.filter((c) => c !== column) : [...prev, column]))
   }
 
-  const generateMockLightCurve = () => {
-    const points = 1000
-    const time: number[] = []
-    const flux: number[] = []
-    const fluxErr: number[] = []
-
-    for (let i = 0; i < points; i++) {
-      const t = i * 0.02
-      time.push(t)
-      let f = 1.0 + Math.random() * 0.001
-      if ((t % 3.5 > 1.7 && t % 3.5 < 1.85) || (t % 3.5 > 5.2 && t % 3.5 < 5.35)) {
-        f -= 0.015
-      }
-      flux.push(f)
-      fluxErr.push(0.0005 + Math.random() * 0.0003)
-    }
-
-    return { time, flux, fluxErr }
-  }
-
   const fetchTargetData = async () => {
     if (!targetId.trim()) {
       setError("Please enter a target ID")
@@ -116,26 +97,26 @@ export function ResearcherMode({ controls, onResultsChange, onLoadingChange }: R
     setError(null)
 
     try {
-      await new Promise((resolve) => setTimeout(resolve, 1500))
+      const normalizedId = normalizeTargetId(targetId)
 
-      const mockResult: PredictionResult = {
-        targetId: normalizeTargetId(targetId),
-        modelProbabilityCandidate: 0.73,
-        modelLabel: controls.threshold <= 0.73 ? "candidate" : "false-positive",
-        modelVersion: "v2.1.0-researcher",
-        topFeatures: controls.explainability.featureImportances
-          ? selectedColumns.slice(0, 5).map((col, idx) => ({
-              name: col,
-              contribution: 0.25 - idx * 0.04,
-            }))
-          : undefined,
-        nearestExamples: controls.explainability.nearestExamples
-          ? [
-              { id: "KOI-456.01", distance: 0.023, disposition: "CONFIRMED" },
-              { id: "KOI-789.01", distance: 0.045, disposition: "CANDIDATE" },
-            ]
-          : undefined,
-        lightCurve: generateMockLightCurve(),
+      // Call the backend API with researcher mode parameters
+      const response = await api.predictArchive({
+        identifier: normalizedId,
+        mission: controls.mission,
+        include_light_curve: true,
+      })
+
+      // Map API response to PredictionResult
+      const result: PredictionResult = {
+        targetId: response.target,
+        modelProbabilityCandidate: response.model_probability_candidate,
+        modelLabel: response.model_label as "candidate" | "false-positive" | "abstain",
+        modelVersion: response.model_version,
+        topFeatures: response.top_features?.map((feature) => {
+          const [name, contribution] = Object.entries(feature)[0]
+          return { name, contribution }
+        }),
+        archiveSnapshot: response.archive_snapshot,
         detrendMethod,
         transitEvents:
           transitSearchMethod && transitSearchMethod !== "none"
@@ -149,12 +130,19 @@ export function ResearcherMode({ controls, onResultsChange, onLoadingChange }: R
           detrendMethod,
           transitSearchMethod: transitSearchMethod || "none",
           searchParams: transitSearchMethod ? searchParams : undefined,
+          confidence: response.confidence,
+          processingTime: `${response.processing_time.toFixed(2)}s`,
+          modelName: response.model_name,
+          features: response.features,
+          transitParams: response.transit_params,
+          reasoning: response.reasoning,
         },
       }
 
-      onResultsChange(mockResult)
-    } catch (_err) {
-      setError("Failed to fetch target data. Please try again.")
+      onResultsChange(result)
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : "Failed to fetch target data. Please try again."
+      setError(errorMessage)
       onResultsChange(null)
     } finally {
       setIsValidating(false)
