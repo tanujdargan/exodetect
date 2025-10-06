@@ -21,7 +21,6 @@ import { Label } from "@/components/ui/label"
 import { Slider } from "@/components/ui/slider"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
 import { LogOut } from "lucide-react"
 import type { GlobalControls, PredictionResult } from "@/lib/types"
 

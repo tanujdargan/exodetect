@@ -41,7 +41,7 @@ export default function AboutPage() {
             transition={{ duration: 0.6 }}
             className="text-center space-y-6"
           >
-            <h1 className="text-5xl font-bold tracking-tight">About ExoDetect and It's Creators</h1>
+            <h1 className="text-5xl font-bold tracking-tight">About ExoDetect and Its Creators</h1>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
               Empowering astronomers, researchers, and citizen scientists to discover new worlds beyond our solar system.
             </p>
