@@ -162,7 +162,7 @@ export function ExplorerMode({ controls, onResultsChange, onLoadingChange }: Exp
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
                 type="text"
-                placeholder="Enter target ID (e.g., KOI-123.01, KIC-12345678)"
+                placeholder="Enter target ID (e.g. KOI-007.01)"
                 value={targetId}
                 onChange={(e) => handleInputChange(e.target.value)}
                 className="pl-10"

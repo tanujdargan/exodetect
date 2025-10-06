@@ -200,7 +200,7 @@ export function ResearcherMode({ controls, onResultsChange, onLoadingChange }: R
                 <Input
                   id="researcher-target"
                   type="text"
-                  placeholder="Enter target ID (e.g., KOI-123.01)"
+                  placeholder="Enter target ID (e.g., KOI-007.01)"
                   value={targetId}
                   onChange={(e) => {
                     setTargetId(e.target.value)
