@@ -2,7 +2,7 @@
 
 import { useEffect } from "react"
 import { useRouter } from "next/navigation"
-import { useUser } from "@auth0/nextjs-auth0/client"
+import { useUser } from "@auth0/nextjs-auth0"
 
 import { Button } from "@/components/ui/button"
 import { Globe } from "@/components/ui/globe"
@@ -65,13 +65,23 @@ export default function LandingPage() {
                 <ShineBorder borderWidth={2} duration={16} shineColor={["#22d3ee", "#a78bfa", "#f97316"]} className="opacity-70" />
                 <div className="relative rounded-[inherit] border border-border bg-card/30 backdrop-blur p-6">
                   <div className="space-y-4">
-                    <Button
-                      onClick={() => window.location.href = '/api/auth/login'}
-                      className="w-full"
-                      disabled={isLoading}
-                    >
-                      {isLoading ? "Loading..." : "Sign in with Email"}
-                    </Button>
+                    <div className="grid grid-cols-2 gap-3">
+                      <Button
+                        onClick={() => window.location.href = '/api/auth/login'}
+                        className="w-full"
+                        disabled={isLoading}
+                      >
+                        {isLoading ? "Loading..." : "Sign In"}
+                      </Button>
+                      <Button
+                        onClick={() => window.location.href = '/api/auth/signup'}
+                        variant="outline"
+                        className="w-full"
+                        disabled={isLoading}
+                      >
+                        {isLoading ? "Loading..." : "Sign Up"}
+                      </Button>
+                    </div>
 
                     <div className="relative my-6">
                       <div className="absolute inset-0 flex items-center" aria-hidden="true">

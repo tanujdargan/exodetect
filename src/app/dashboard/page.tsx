@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { useUser } from "@auth0/nextjs-auth0/client"
+import { useUser } from "@auth0/nextjs-auth0"
 import { motion } from "motion/react"
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, DragEndEvent } from "@dnd-kit/core"
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy, useSortable } from "@dnd-kit/sortable"
@@ -78,19 +78,6 @@ export default function DashboardPage() {
   const [tileOrder, setTileOrder] = useState<TileId[]>(["lightCurve", "stellarium", "results"])
   const [isMounted, setIsMounted] = useState(false)
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center space-y-3">
-          <div className="w-16 h-16 mx-auto rounded-full bg-violet-500/10 flex items-center justify-center">
-            <div className="w-8 h-8 rounded-full bg-violet-500/20 animate-pulse" />
-          </div>
-          <p className="text-sm text-muted-foreground font-medium">Loading...</p>
-        </div>
-      </div>
-    )
-  }
-
   // Load tile order from localStorage on mount (client-side only)
   useEffect(() => {
     setIsMounted(true)
@@ -142,6 +129,19 @@ export default function DashboardPage() {
       }
       setResult(updatedResult)
     }
+  }
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center space-y-3">
+          <div className="w-16 h-16 mx-auto rounded-full bg-violet-500/10 flex items-center justify-center">
+            <div className="w-8 h-8 rounded-full bg-violet-500/20 animate-pulse" />
+          </div>
+          <p className="text-sm text-muted-foreground font-medium">Loading...</p>
+        </div>
+      </div>
+    )
   }
 
   return (
