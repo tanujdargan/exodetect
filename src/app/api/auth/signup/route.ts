@@ -4,7 +4,7 @@ const auth0 = new Auth0Client();
 
 export async function GET() {
   return auth0.startInteractiveLogin({
-    authorizationParams: {
+    authorizationParameters: {
       screen_hint: 'signup'
     }
   });

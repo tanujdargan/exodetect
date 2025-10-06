@@ -7,9 +7,9 @@ export async function GET(req: NextRequest) {
   const searchParams = req.nextUrl.searchParams;
   const connection = searchParams.get('connection');
 
-  const options: any = {};
+  const options: { authorizationParameters?: { connection?: string; screen_hint?: string } } = {};
   if (connection) {
-    options.authorizationParams = { connection };
+    options.authorizationParameters = { connection };
   }
 
   return auth0.startInteractiveLogin(options);

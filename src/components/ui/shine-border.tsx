@@ -37,6 +37,7 @@ export function ShineBorder({
 }: ShineBorderProps) {
   return (
     <div
+      suppressHydrationWarning
       style={
         {
           "--border-width": `${borderWidth}px`,
