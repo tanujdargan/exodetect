@@ -19,7 +19,11 @@
       "Bash(curl \"https://exoplanetarchive.ipac.caltech.edu/TAP/sync?query=SELECT+kepoi_name,kepid+FROM+cumulative+WHERE+kepoi_name+=+''''K00007.01''''&format=json\")",
       "Bash(curl -s \"https://exoplanetarchive.ipac.caltech.edu/TAP/sync?query=SELECT+kepoi_name,kepid,koi_disposition,koi_pdisposition,koi_score,koi_period,koi_duration,koi_depth,koi_prad,koi_teq,koi_insol,koi_steff,koi_slogg,koi_srad,koi_flag_ntl,koi_flag_ss,koi_flag_co,koi_flag_em+FROM+cumulative+WHERE+kepoi_name+=+%27K00007.01%27&format=json\")",
       "Bash(curl \"https://exoplanetarchive.ipac.caltech.edu/TAP/sync?query=SELECT+kepoi_name,kepid+FROM+cumulative+WHERE+kepoi_name+=+%27K00007.01%27&format=json\")",
-      "Bash(pip install:*)"
+      "Bash(pip install:*)",
+      "Bash(curl -s \"https://exoplanetarchive.ipac.caltech.edu/TAP/sync?query=SELECT+kepoi_name,kepid+FROM+cumulative+WHERE+kepid+=+5568067&format=json\")",
+      "Bash(curl -s \"https://exoplanetarchive.ipac.caltech.edu/TAP/sync?query=SELECT+pl_name,hostname+FROM+ps+WHERE+hostname+LIKE+%27%25-5568067%25%27&format=json\")",
+      "Bash(npm install:*)",
+      "Bash(openssl rand:*)"
     ],
     "deny": [],
     "ask": []

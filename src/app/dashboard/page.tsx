@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { useUser } from "@auth0/nextjs-auth0/client"
 import { motion } from "motion/react"
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, DragEndEvent } from "@dnd-kit/core"
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy, useSortable } from "@dnd-kit/sortable"
@@ -20,6 +21,8 @@ import { Label } from "@/components/ui/label"
 import { Slider } from "@/components/ui/slider"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { LogOut } from "lucide-react"
 import type { GlobalControls, PredictionResult } from "@/lib/types"
 
 type TileId = "lightCurve" | "stellarium" | "results"
@@ -60,6 +63,7 @@ function SortableTile({ id, children }: SortableTileProps) {
 }
 
 export default function DashboardPage() {
+  const { user, isLoading } = useUser()
   const [controls, setControls] = useState<GlobalControls>({
     mode: "explorer",
     mission: "kepler",
@@ -75,6 +79,19 @@ export default function DashboardPage() {
   const [result, setResult] = useState<PredictionResult | null>(null)
   const [tileOrder, setTileOrder] = useState<TileId[]>(["lightCurve", "stellarium", "results"])
   const [isMounted, setIsMounted] = useState(false)
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center space-y-3">
+          <div className="w-16 h-16 mx-auto rounded-full bg-violet-500/10 flex items-center justify-center">
+            <div className="w-8 h-8 rounded-full bg-violet-500/20 animate-pulse" />
+          </div>
+          <p className="text-sm text-muted-foreground font-medium">Loading...</p>
+        </div>
+      </div>
+    )
+  }
 
   // Load tile order from localStorage on mount (client-side only)
   useEffect(() => {
@@ -170,13 +187,33 @@ export default function DashboardPage() {
               transition={{ duration: 0.6 }}
               className="flex flex-col items-center lg:items-start"
             >
-              <MorphingText
-                texts={["ExoDetect", "Exoplanet Detect"]}
-                className="text-white drop-shadow-lg whitespace-nowrap text-4xl lg:text-5xl"
-              />
-              <p className="text-white/80 italic text-sm md:text-base font-light mt-2">
-                &quot;Empowering every explorer to find new worlds.&quot;
-              </p>
+              <div className="flex items-center gap-4">
+                <div>
+                  <MorphingText
+                    texts={["ExoDetect", "Exoplanet Detect"]}
+                    className="text-white drop-shadow-lg whitespace-nowrap text-4xl lg:text-5xl"
+                  />
+                  <p className="text-white/80 italic text-sm md:text-base font-light mt-2">
+                    &quot;Empowering every explorer to find new worlds.&quot;
+                  </p>
+                </div>
+              </div>
+              {user && (
+                <div className="mt-3 flex items-center gap-3">
+                  <p className="text-sm text-white/60">
+                    {user.email}
+                  </p>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => window.location.href = '/api/auth/logout'}
+                    className="gap-2"
+                  >
+                    <LogOut className="w-4 h-4" />
+                    Logout
+                  </Button>
+                </div>
+              )}
             </motion.div>
 
             {/* Right: Controls */}
