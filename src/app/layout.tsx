@@ -5,6 +5,7 @@ import { GeistMono } from "geist/font/mono"
 import { Analytics } from "@vercel/analytics/next"
 import "./globals.css"
 import { Suspense } from "react"
+import { UserProvider } from "@/components/user-provider"
 
 export const metadata: Metadata = {
   title: "Exoplanet Candidate Classifier",
@@ -22,8 +23,10 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark" suppressHydrationWarning>
       <body className={`font-sans ${GeistSans.variable} ${GeistMono.variable} antialiased`}>
-        <Suspense fallback={<div>Loading...</div>}>{children}</Suspense>
-        <Analytics />
+        <UserProvider>
+          <Suspense fallback={<div>Loading...</div>}>{children}</Suspense>
+          <Analytics />
+        </UserProvider>
       </body>
     </html>
   )

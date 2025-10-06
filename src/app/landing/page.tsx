@@ -1,36 +1,23 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect } from "react"
 import { useRouter } from "next/navigation"
+import { useUser } from "@auth0/nextjs-auth0/client"
 
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
 import { Globe } from "@/components/ui/globe"
 import { ShineBorder } from "@/components/ui/shine-border"
 import { Github, Globe as GlobeIcon } from "lucide-react"
-import { MorphingText } from "@/components/ui/morphing-text"
 
 export default function LandingPage() {
   const router = useRouter()
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
-  const [error, setError] = useState<string | null>(null)
-  const [isSubmitting, setIsSubmitting] = useState(false)
+  const { user, isLoading } = useUser()
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setError(null)
-    setIsSubmitting(true)
-
-    if (email === "admin@uvic.ca" && password === "1234") {
-      await new Promise((r) => setTimeout(r, 400))
+  useEffect(() => {
+    if (user && !isLoading) {
       router.push("/dashboard")
-    } else {
-      setError("Invalid credentials")
     }
-    setIsSubmitting(false)
-  }
+  }, [user, isLoading, router])
 
   const SocialIconButton = ({ ariaLabel, children, onClick }: { ariaLabel: string; children: React.ReactNode; onClick?: () => void }) => (
     <Button
@@ -71,48 +58,19 @@ export default function LandingPage() {
           <div className="w-full">
             <div className="max-w-md">
               <div className="space-y-2 mb-6">
-                {/*<MorphingText
-                  texts={["Welcome to ExoDetect", "Discover Exoplanets"]}
-                  className="text-xl md:text-2xl font-semibold tracking-tight"
-                />*/}
                 <h1 className="text-xl md:text-2xl font-semibold tracking-tight">Welcome to ExoDetect</h1>
                 <p className="text-muted-foreground">Sign in to access your dashboard.</p>
               </div>
               <div className="relative rounded-xl">
                 <ShineBorder borderWidth={2} duration={16} shineColor={["#22d3ee", "#a78bfa", "#f97316"]} className="opacity-70" />
                 <div className="relative rounded-[inherit] border border-border bg-card/30 backdrop-blur p-6">
-                  <form className="space-y-4" onSubmit={handleSubmit}>
-                    <div className="space-y-2">
-                      <Label htmlFor="email">Email</Label>
-                      <Input
-                        id="email"
-                        type="email"
-                        autoComplete="email"
-                        placeholder="you@example.com"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="password">Password</Label>
-                      <Input
-                        id="password"
-                        type="password"
-                        autoComplete="current-password"
-                        placeholder="••••"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                      />
-                    </div>
-
-                    {error ? (
-                      <div className="text-sm text-destructive" role="alert">
-                        {error}
-                      </div>
-                    ) : null}
-
-                    <Button type="submit" className="w-full" disabled={isSubmitting}>
-                      {isSubmitting ? "Signing in..." : "Sign in"}
+                  <div className="space-y-4">
+                    <Button
+                      onClick={() => window.location.href = '/api/auth/login'}
+                      className="w-full"
+                      disabled={isLoading}
+                    >
+                      {isLoading ? "Loading..." : "Sign in with Email"}
                     </Button>
 
                     <div className="relative my-6">
@@ -125,24 +83,29 @@ export default function LandingPage() {
                     </div>
 
                     <div className="grid grid-cols-4 gap-3">
-                      <SocialIconButton ariaLabel="Sign in with Google" onClick={() => {}}>
+                      <SocialIconButton
+                        ariaLabel="Sign in with Google"
+                        onClick={() => window.location.href = '/api/auth/login?connection=google-oauth2'}
+                      >
                         <GoogleIcon />
                       </SocialIconButton>
-                      <SocialIconButton ariaLabel="Sign in with Apple" onClick={() => {}}>
+                      <SocialIconButton
+                        ariaLabel="Sign in with Apple"
+                        onClick={() => window.location.href = '/api/auth/login?connection=apple'}
+                      >
                         <AppleBrandIcon className="size-8" />
                       </SocialIconButton>
-                      <SocialIconButton ariaLabel="Sign in with GitHub" onClick={() => {}}>
+                      <SocialIconButton
+                        ariaLabel="Sign in with GitHub"
+                        onClick={() => window.location.href = '/api/auth/login?connection=github'}
+                      >
                         <Github className="size-6" />
                       </SocialIconButton>
                       <SocialIconButton ariaLabel="Enterprise SSO" onClick={() => {}}>
                         <GlobeIcon className="size-6" />
                       </SocialIconButton>
                     </div>
-
-                    <p className="text-xs text-muted-foreground">
-                      Demo credentials: <span className="font-medium">admin@uvic.ca</span> / <span className="font-medium">1234</span>
-                    </p>
-                  </form>
+                  </div>
                 </div>
               </div>
 
