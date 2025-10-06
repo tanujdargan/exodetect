@@ -72,7 +72,12 @@ def test_upload():
     print("Testing File Upload")
     print("=" * 50)
 
-    csv_file = "sample_data/kepler_light_curve_sample.csv"
+    # Use the high-quality synthetic sample with multiple transits
+    csv_file = "sample_data/hot_jupiter_lc.csv"
+
+    # Fallback to original sample if hot jupiter not available
+    if not os.path.exists(csv_file):
+        csv_file = "sample_data/kepler_light_curve_sample.csv"
 
     if not os.path.exists(csv_file):
         print(f"❌ Sample file not found: {csv_file}")

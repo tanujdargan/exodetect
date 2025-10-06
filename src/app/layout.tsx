@@ -9,7 +9,9 @@ import { Suspense } from "react"
 export const metadata: Metadata = {
   title: "Exoplanet Candidate Classifier",
   description: "ML-powered exoplanet transit signal analysis for Kepler, K2, and TESS missions",
-  generator: "v0.app",
+  icons: {
+    icon: "/planet.ico",
+  },
 }
 
 export default function RootLayout({
