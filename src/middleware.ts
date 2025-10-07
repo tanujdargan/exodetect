@@ -2,11 +2,16 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
 export function middleware(request: NextRequest) {
-  // Auth0 handles authentication through cookies
-  // If no session cookie, redirect to login
-  const sessionCookie = request.cookies.get('appSession');
+  // Check for the __session cookie set by Auth0
+  const sessionCookie = request.cookies.get('__session');
 
-  if (!sessionCookie && request.nextUrl.pathname.startsWith('/dashboard')) {
+  // Allow requests to pass through if they have the session cookie
+  if (sessionCookie) {
+    return NextResponse.next();
+  }
+
+  // Redirect unauthenticated users to landing page
+  if (request.nextUrl.pathname.startsWith('/dashboard')) {
     return NextResponse.redirect(new URL('/landing', request.url));
   }
 

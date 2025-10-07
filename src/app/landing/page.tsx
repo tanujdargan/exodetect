@@ -11,13 +11,13 @@ import { Github, Globe as GlobeIcon } from "lucide-react"
 
 export default function LandingPage() {
   const router = useRouter()
-  const { user, isLoading } = useUser()
+  const { user, isLoading, error } = useUser()
 
   useEffect(() => {
     if (user && !isLoading) {
-      router.push("/dashboard")
+      window.location.href = "/dashboard"
     }
-  }, [user, isLoading, router])
+  }, [user, isLoading])
 
   const SocialIconButton = ({ ariaLabel, children, onClick }: { ariaLabel: string; children: React.ReactNode; onClick?: () => void }) => (
     <Button
